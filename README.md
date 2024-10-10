@@ -18,15 +18,19 @@ The library includes a selection of well-defined classes, each serving a distinc
 1. ComboClassConfigurator
 Purpose: Dynamically combine or switch between multiple CSS classes on elements, providing greater flexibility in managing styles based on user interaction.
 Use Case: Modify the appearance of elements as users interact with them (e.g., toggling classes for active/inactive states or switching themes).
+
 2. Slider
 Purpose: Create a customizable slider component for content like image galleries, testimonials, or product showcases.
 Use Case: Enhance or replace Webflow’s built-in slider with more control over transitions, timing, and responsive behavior.
+
 3. Filter
 Purpose: Apply dynamic filtering to a collection of elements based on user input or predefined categories.
 Use Case: Filter a list of products, blog posts, or portfolio items by category or attribute without requiring a page reload.
+
 4. ScrollBrightness
 Purpose: Adjust the brightness or opacity of elements in response to scroll position, adding dynamic visual effects as users move through the page.
 Use Case: Create visually engaging scrolling effects that highlight sections of content as the user navigates the page.
+
 5. Typewriter
 Purpose: Simulate a typewriter effect for text, where characters are displayed one by one, mimicking a typing animation.
 Use Case: Add engaging text animations to headlines, hero sections, or calls-to-action that draw attention to key messaging.
