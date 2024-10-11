@@ -1,3 +1,10 @@
+W       W  eeeee  bbbbb   fffff  l       oooo   w       w
+W   W   W  e      b    b  f      l      o    o  w   w   w
+W  W W  W  eeee   bbbbb   fff    l      o    o  w  W W  w
+W W   W W  e      b    b  f      l      o    o  w W   W w
+W       W  eeeee  bbbbb   f      lllll   oooo   w       w
+
+
 # JavaScript Library for Enhancing Webflow Front-End Functionality
 
 This repository contains a JavaScript library designed to enhance and streamline the front-end functionality of websites built on the **Webflow** platform. The library provides a set of modular, reusable classes to manage various interactive and dynamic behaviors, focusing on improving performance and user experience in Webflow projects.
