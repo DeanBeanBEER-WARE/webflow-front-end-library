@@ -5,7 +5,152 @@
  * user interactions and scroll events. It allows for flexible configurations, including event-based
  * triggers, threshold-based class manipulations, debounce handling, and more. The class supports
  * both attribute-based pairing and repeat configurations for applying classes to multiple elements.
+ * 
+ * @version 1.0.0
+ * @license MIT
+ * 
+ * ## Usage
+ * 
+ * Include this script via a CDN or local file, then instantiate the `ComboClassConfigurator` class
+ * with the desired configuration options.
+ * 
+ * ```javascript
+ * const classConfigs = [
+ *     {
+ *         eventName: "click",
+ *         parentElement: "parent-1",
+ *         triggerElement: "trigger-1",
+ *         addClasses: ["active"],
+ *         removeClasses: ["inactive"],
+ *         callback: (element, action) => {
+ *             console.log(`Element ${element.id} had classes ${action}`);
+ *         }
+ *     },
+ *     {
+ *         eventName: "hover",
+ *         parentElement: ".parent-class",
+ *         triggerElement: ".trigger-class",
+ *         addClasses: ["hovered"],
+ *         removeClasses: ["not-hovered"],
+ *         switchAction: true
+ *     },
+ *     {
+ *         eventName: "scrollInView",
+ *         parentAttribut: "data-parent",
+ *         triggerAttribut: "data-trigger",
+ *         entryThreshold: 50,
+ *         exitThreshold: 25,
+ *         addClasses: ["visible"],
+ *         removeClasses: ["hidden"],
+ *         once: true
+ *     }
+ * ];
+ * 
+ * // Initialize the ComboClassConfigurator with the provided configurations
+ * const configurator = new ComboClassConfigurator(classConfigs);
+ * ```
+ * 
+ * ## Configuration Options
+ * 
+ * Each configuration object within the `configs` array can have the following properties:
+ * 
+ * | Property              | Type                | Description                                                                                                 |
+ * |-----------------------|---------------------|-------------------------------------------------------------------------------------------------------------|
+ * | `eventName`           | `string`            | The type of event to listen for. Possible values: `"click"`, `"hover"`, `"scrollInView"`.                   |
+ * | `transitionTime`      | `string`            | The CSS transition time (e.g., `"0.5s"`). Default is `"0s"`.                                                |
+ * | `removeTransitionTime`| `string|null`       | The CSS transition time when removing classes. If `null`, defaults to `transitionTime`.                     |
+ * | `easingMode`          | `string`            | The CSS easing function. Possible values: `"ease"`, `"ease-in"`, `"ease-out"`, `"ease-in-out"`.             |
+ * | `entryThreshold`      | `number`            | The percentage threshold for scroll events to trigger class addition. Must be between 0 and 100.            |
+ * | `exitThreshold`       | `number|null`       | The percentage threshold for scroll events to trigger class removal. Must be between 0 and 100.             |
+ * | `parentElement`       | `string|HTMLElement`| The selector or reference to the parent element containing target elements.                                 |
+ * | `triggerElement`      | `string|HTMLElement`| The selector or reference to the element that triggers the event.                                           |
+ * | `once`                | `boolean`           | If `true`, the event listener will be removed after the first trigger. Default is `false`.                  |
+ * | `debounce`            | `number`            | The debounce delay in milliseconds for event handling. Default is `0`.                                      |
+ * | `switchAction`        | `boolean`           | If `true`, toggles between adding and removing classes on events. Default is `false`.                       |
+ * | `repeatConfiguration` | `number`            | The number of times to repeat the configuration for multiple elements. Must be >= 1. Default is `1`.        |
+ * | `triggerAttribut`     | `string`            | The attribute name used for pairing trigger elements.                                                       |
+ * | `parentAttribut`      | `string`            | The attribute name used for pairing parent elements.                                                        |
+ * | `callback`            | `Function|null`     | A callback function executed after classes are added or removed.                                            |
+ * | `classesAdded`        | `boolean`           | Internal flag indicating if classes have been added. Default is `false`.                                    |
+ * | `start`               | `number`            | The starting index for class manipulation. Default is `1`.                                                  |
+ * | `end`                 | `number`            | The ending index for class manipulation. Default is `0` (no end).                                           |
+ * | `frequency`           | `number`            | The frequency at which classes are added or removed. Default is `1`.                                        |
+ * | `addClasses`          | `Array<string>`     | Array of class names to add to target elements.                                                             |
+ * | `removeClasses`       | `Array<string>`     | Array of class names to remove from target elements.                                                        |
+ * | `topAddClasses`       | `Array<string>`     | Array of class names to add at the top level, affecting multiple elements.                                  |
+ * 
+ * ### Notes
+ * 
+ * - When using attribute-based pairing (`triggerAttribut` and `parentAttribut`), elements must have the corresponding attributes with matching values to establish the pairing.
+ * - The `debounce` parameter helps in controlling the frequency of class manipulations, especially useful for events that can fire rapidly like scroll or resize.
+ * - The `callback` function, if provided, is executed after classes are added or removed, allowing for additional custom behavior.
+ * - The `once` parameter ensures that certain class manipulations occur only once, useful for animations or one-time effects.
+ * - Ensure that the provided selectors or IDs (`parentElement`, `triggerElement`) exist in the DOM.
+ * 
+ * ## Methods
+ * 
+ * | Method                            | Description                                                                                                           |
+ * |-----------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+ * | `constructor(configs)`            | Initializes the class with the provided configurations and sets up the necessary observers and listeners.             |
+ * | `setup()`                         | Merges default settings with user configurations, validates parameters, and processes each configuration.             |
+ * | `_validateThreshold()`            | Validates that a threshold value is a number between 0 and 100.                                                       |
+ * | `_cleanClasses()`                 | Cleans an array of class names by removing dots, trimming whitespace, and filtering out empty strings.                |
+ * | `_processAttributeBasedPairing()` | Processes configurations based on attribute-based pairing between parent and trigger elements.                        |
+ * | `_mapElementsByAttribute()`       | Maps DOM elements by a specific attribute value.                                                                      |
+ * | `_processRepeatConfiguration()`   | Processes configurations that require repeating based on the repeatConfiguration value.                               |
+ * | `initEventListeners()`            | Initializes event listeners for each class configuration based on the specified event types.                          |
+ * | `_calculateThresholds()`          | Calculates and normalizes the entry and exit thresholds.                                                              |
+ * | `_initClasses()`                  | Initializes classes on target elements by adding or removing specified classes.                                       |
+ * | `_handleClick()`                  | Handles click events by toggling classes based on the current state.                                                  |
+ * | `_handleHover()`                  | Handles hover events by adding or removing classes on mouse enter and leave.                                          |
+ * | `_handleScrollInView()`           | Handles scroll-in-view events by observing elements entering or exiting the viewport.                                 |
+ * | `_applyImmediateClasses()`        | Applies classes immediately based on the configuration without waiting for events.                                    |
+ * 
+ * ## Example
+ * 
+ * ```javascript
+ * const classConfigs = [
+ *     {
+ *         eventName: "click",
+ *         parentElement: "parent-1",
+ *         triggerElement: "trigger-1",
+ *         addClasses: ["active"],
+ *         removeClasses: ["inactive"],
+ *         callback: (element, action) => {
+ *             console.log(`Element ${element.id} had classes ${action}`);
+ *         }
+ *     },
+ *     {
+ *         eventName: "hover",
+ *         parentElement: ".parent-class",
+ *         triggerElement: ".trigger-class",
+ *         addClasses: ["hovered"],
+ *         removeClasses: ["not-hovered"],
+ *         switchAction: true
+ *     },
+ *     {
+ *         eventName: "scrollInView",
+ *         parentAttribut: "data-parent",
+ *         triggerAttribut: "data-trigger",
+ *         entryThreshold: 50,
+ *         exitThreshold: 25,
+ *         addClasses: ["visible"],
+ *         removeClasses: ["hidden"],
+ *         once: true
+ *     }
+ * ];
+ * 
+ * // Initialize the ComboClassConfigurator with the provided configurations
+ * const configurator = new ComboClassConfigurator(classConfigs);
+ * ```
+ * 
+ * In this example:
+ * 
+ * - The first configuration adds the "active" class and removes the "inactive" class when the element with ID "trigger-1" is clicked. A callback logs the action.
+ * - The second configuration toggles the "hovered" and "not-hovered" classes on elements with the class "trigger-class" when hovered, allowing for switching actions.
+ * - The third configuration adds the "visible" class and removes the "hidden" class when elements with the attribute "data-trigger" paired with their respective parents (having "data-parent") enter the viewport at a 50% threshold and exit at a 25% threshold. The `once` flag ensures the observer is disconnected after the first trigger.
  */
+
 class ComboClassConfigurator {
     /**
      * Constructs a new ComboClassConfigurator instance.
@@ -655,204 +800,3 @@ function getElement(selectorOrId) {
 
 // Expose the ComboClassConfigurator class to the global window object for external access
 window.ComboClassConfigurator = ComboClassConfigurator;
-
-/*
- * Documentation
- * 
- * ComboClassConfigurator Class
- * 
- * - Purpose: Dynamically adds or removes CSS classes on target elements based on user interactions
- *   such as clicks, hovers, and scroll events. It supports complex configurations, including 
- *   attribute-based element pairing and repeat configurations for multiple elements.
- * - Constructor Parameters:
- *   - configs (Array<Object>): An array where each object contains configuration options for class manipulation.
- *     - eventName (string, optional): The type of event to listen for ("click", "hover", "scrollInView"). Default is "click".
- *     - transitionTime (string, optional): The CSS transition time (e.g., "0.5s"). Default is "0s".
- *     - removeTransitionTime (string, optional): The CSS transition time when removing classes.
- *     - easingMode (string, optional): The CSS easing function ("ease", "ease-in", "ease-out", "ease-in-out"). Default is "ease".
- *     - entryThreshold (number, optional): The percentage threshold for scroll events to trigger class addition. Default is 0.
- *     - exitThreshold (number|null, optional): The percentage threshold for scroll events to trigger class removal. Default is null.
- *     - parentElement (string|HTMLElement, optional): The selector or reference to the parent element containing target elements.
- *     - triggerElement (string|HTMLElement, optional): The selector or reference to the element that triggers the event.
- *     - once (boolean, optional): If true, the event listener will be removed after the first trigger. Default is false.
- *     - debounce (number, optional): The debounce delay in milliseconds for event handling. Default is 0.
- *     - switchAction (boolean, optional): If true, toggles between adding and removing classes on events. Default is false.
- *     - repeatConfiguration (number, optional): The number of times to repeat the configuration for multiple elements. Must be >= 1. Default is 1.
- *     - triggerAttribut (string, optional): The attribute name used for pairing trigger elements.
- *     - parentAttribut (string, optional): The attribute name used for pairing parent elements.
- *     - callback (Function, optional): A callback function executed after classes are added or removed.
- *     - classesAdded (boolean, optional): Internal flag indicating if classes have been added. Default is false.
- *     - start (number, optional): The starting index for class manipulation. Default is 1.
- *     - end (number, optional): The ending index for class manipulation. Default is 0 (no end).
- *     - frequency (number, optional): The frequency at which classes are added or removed. Default is 1.
- *     - addClasses (Array<string>, optional): Array of class names to add to target elements.
- *     - removeClasses (Array<string>, optional): Array of class names to remove from target elements.
- *     - topAddClasses (Array<string>, optional): Array of class names to add at the top level, affecting multiple elements.
- * 
- * Methods:
- * 
- * - setup():
- *     - Description: Merges user configurations with default settings, validates parameters, and processes each configuration.
- *     - Parameters: None
- *     - Returns: void
- * 
- * - _validateThreshold(value, defaultValue):
- *     - Description: Ensures that a threshold value is a number between 0 and 100.
- *     - Parameters:
- *         - value (number): The threshold value to validate.
- *         - defaultValue (number): The default value to use if validation fails.
- *     - Returns: number - The validated threshold value.
- *     - Access: private
- * 
- * - _cleanClasses(classes):
- *     - Description: Cleans an array of class names by removing dots, trimming whitespace, and filtering out empty strings.
- *     - Parameters:
- *         - classes (Array<string>): The array of class names to clean.
- *     - Returns: Array<string> - The cleaned array of class names.
- *     - Access: private
- * 
- * - _processAttributeBasedPairing(config):
- *     - Description: Processes configurations based on attribute-based pairing between parent and trigger elements.
- *     - Parameters:
- *         - config (Object): The merged configuration object.
- *     - Returns: void
- *     - Access: private
- * 
- * - _mapElementsByAttribute(elements, attribute):
- *     - Description: Maps DOM elements by a specific attribute value.
- *     - Parameters:
- *         - elements (NodeListOf<Element>): The list of elements to map.
- *         - attribute (string): The attribute to map elements by.
- *     - Returns: Map<string, Array<Element>> - A map of attribute values to arrays of elements.
- *     - Access: private
- * 
- * - _processRepeatConfiguration(config, repeatCount):
- *     - Description: Processes configurations that require repeating based on the repeatConfiguration value.
- *     - Parameters:
- *         - config (Object): The merged configuration object.
- *         - repeatCount (number): The number of times to repeat the configuration.
- *     - Returns: void
- *     - Access: private
- * 
- * - initEventListeners():
- *     - Description: Initializes event listeners for each class configuration based on the specified event types.
- *     - Parameters: None
- *     - Returns: void
- *     - Access: private
- * 
- * - _calculateThresholds(entry, exit):
- *     - Description: Calculates and normalizes the entry and exit thresholds.
- *     - Parameters:
- *         - entry (number): The entry threshold percentage.
- *         - exit (number|null): The exit threshold percentage.
- *     - Returns: Array<number> - An array containing normalized entry and exit thresholds.
- *     - Access: private
- * 
- * - _initClasses(config, action):
- *     - Description: Initializes classes on target elements by adding or removing specified classes.
- *     - Parameters:
- *         - config (Object): The class configuration object.
- *         - action (string): The action to perform ("add" or "remove").
- *     - Returns: void
- *     - Access: private
- * 
- * - _handleClick(element, config, addCallback, removeCallback, thresholds):
- *     - Description: Handles click events by toggling classes based on the current state.
- *     * Parameters:
- *         - element (HTMLElement): The trigger element that was clicked.
- *         - config (Object): The class configuration object.
- *         - addCallback (Function): The debounced function to add classes.
- *         - removeCallback (Function): The debounced function to remove classes.
- *         - thresholds (Array<number>): The entry and exit thresholds.
- *     - Returns: void
- *     - Access: private
- * 
- * - _handleHover(element, config, addCallback, removeCallback, thresholds):
- *     - Description: Handles hover events by adding or removing classes on mouse enter and leave.
- *     - Parameters:
- *         - element (HTMLElement): The trigger element being hovered.
- *         - config (Object): The class configuration object.
- *         - addCallback (Function): The debounced function to add classes.
- *         - removeCallback (Function): The debounced function to remove classes.
- *         - thresholds (Array<number>): The entry and exit thresholds.
- *     - Returns: void
- *     - Access: private
- * 
- * - _handleScrollInView(element, config, addCallback, removeCallback, thresholds):
- *     - Description: Handles scroll-in-view events by observing elements entering or exiting the viewport.
- *     - Parameters:
- *         - element (HTMLElement): The element being observed for scroll events.
- *         - config (Object): The class configuration object.
- *         - addCallback (Function): The debounced function to add classes.
- *         - removeCallback (Function): The debounced function to remove classes.
- *         - thresholds (Array<number>): The entry and exit thresholds.
- *     - Returns: void
- *     - Access: private
- * 
- * - _applyImmediateClasses(config):
- *     - Description: Applies classes immediately based on the configuration without waiting for events.
- *     - Parameters:
- *         - config (Object): The class configuration object.
- *     - Returns: void
- *     - Access: private
- * 
- * Helper Functions:
- * 
- * - getElement(selectorOrId):
- *     - Description: Selects an element by its CSS selector or ID.
- *     - Parameters:
- *         - selectorOrId (string): The CSS selector or ID of the element.
- *     - Returns: HTMLElement|null - The selected element or null if not found.
- * 
- * Usage Example:
- * 
- * ```javascript
- * const classConfigs = [
- *     {
- *         eventName: "click",
- *         parentElement: "parent-1",
- *         triggerElement: "trigger-1",
- *         addClasses: ["active"],
- *         removeClasses: ["inactive"],
- *         callback: (element, action) => {
- *             console.log(`Element ${element.id} had classes ${action}`);
- *         }
- *     },
- *     {
- *         eventName: "hover",
- *         parentElement: ".parent-class",
- *         triggerElement: ".trigger-class",
- *         addClasses: ["hovered"],
- *         removeClasses: ["not-hovered"],
- *         switchAction: true
- *     },
- *     {
- *         eventName: "scrollInView",
- *         parentAttribut: "data-parent",
- *         triggerAttribut: "data-trigger",
- *         entryThreshold: 50,
- *         exitThreshold: 25,
- *         addClasses: ["visible"],
- *         removeClasses: ["hidden"],
- *         once: true
- *     }
- * ];
- * 
- * // Initialize the ComboClassConfigurator with the provided configurations
- * const configurator = new ComboClassConfigurator(classConfigs);
- * ```
- * 
- * In this example:
- * 
- * - The first configuration adds the "active" class and removes the "inactive" class when the element with ID "trigger-1" is clicked. A callback logs the action.
- * - The second configuration toggles the "hovered" and "not-hovered" classes on elements with the class "trigger-class" when hovered, allowing for switching actions.
- * - The third configuration adds the "visible" class and removes the "hidden" class when elements with the attribute "data-trigger" paired with their respective parents (having "data-parent") enter the viewport at a 50% threshold and exit at a 25% threshold. The `once` flag ensures the observer is disconnected after the first trigger.
- * 
- * Notes:
- * 
- * - Ensure that the provided selectors or IDs (`parentElement`, `triggerElement`) exist in the DOM.
- * - When using attribute-based pairing (`triggerAttribut` and `parentAttribut`), elements must have the corresponding attributes with matching values to establish the pairing.
- * - The `debounce` parameter helps in controlling the frequency of class manipulations, especially useful for events that can fire rapidly like scroll or resize.
- * - The `callback` function, if provided, is executed after classes are added or removed, allowing for additional custom behavior.
- * - The `once` parameter ensures that certain class manipulations occur only once, useful for animations or one-time effects.
- */
