@@ -37,28 +37,28 @@
  * 
  * ## Configuration Options
  * 
- * | Option               | Type       | Description                                                                                       |
- * |----------------------|------------|---------------------------------------------------------------------------------------------------|
- * | `scrollSpeed`        | `number`   | Number of pixels to scroll per scroll event.                                                      |
- * | `smoothScrollFactor` | `number`   | Smoothness factor for the scroll animation (0 to 100).                                           |
- * | `pageWrapper`        | `string`   | ID of the page wrapper element that contains all scrollable content.                              |
+ * | Option               | Type       | Description                                                                                                  |
+ * |----------------------|------------|--------------------------------------------------------------------------------------------------------------|
+ * | `scrollSpeed`        | `number`   | Number of pixels to scroll per scroll event.                                                                 |
+ * | `smoothScrollFactor` | `number`   | Smoothness factor for the scroll animation (0 to 100).                                                       |
+ * | `pageWrapper`        | `string`   | ID of the page wrapper element that contains all scrollable content.                                         |
  * | `easingMode`         | `string`   | Easing mode for the scroll animation. Possible values: `'ease'`, `'ease-in'`, `'ease-out'`, `'ease-in-out'`. |
- * | `checkEvent`         | `string`   | Event type to listen for to trigger condition checks. Possible values: `'scroll'`, `'click'`, `'hover'`. |
- * | `hoverTriggers`      | `array`    | (Optional) Array of class names to attach hover event listeners to.                               |
- * | `triggerElements`    | `array`    | (Optional) Array of element IDs to attach the primary event listeners to.                         |
- * | `conditionElements`  | `array`    | Array of element IDs whose CSS attributes will be checked against specified conditions.           |
- * | `conditionArray`     | `array`    | Array of condition objects defining the attributes to check and their target values.              |
- * | `maxCheckDuration`   | `number`   | Maximum duration for repeated condition checks in milliseconds.                                   |
+ * | `checkEvent`         | `string`   | Event type to listen for to trigger condition checks. Possible values: `'scroll'`, `'click'`, `'hover'`.     |
+ * | `hoverTriggers`      | `array`    | (Optional) Array of class names to attach hover event listeners to.                                          |
+ * | `triggerElements`    | `array`    | (Optional) Array of element IDs to attach the primary event listeners to.                                    |
+ * | `conditionElements`  | `array`    | Array of element IDs whose CSS attributes will be checked against specified conditions.                      |
+ * | `conditionArray`     | `array`    | Array of condition objects defining the attributes to check and their target values.                         |
+ * | `maxCheckDuration`   | `number`   | Maximum duration for repeated condition checks in milliseconds.                                              |
  * 
  * ### Condition Object Structure
  * 
  * Each object in the `conditionArray` should have the following properties:
  * 
- * | Property             | Type     | Description                                                                                 |
- * |----------------------|----------|---------------------------------------------------------------------------------------------|
- * | `conditionAttribute` | `string` | The CSS attribute to monitor (e.g., `'opacity'`, `'display'`).                              |
- * | `conditionActive`    | `string` | The value of `conditionAttribute` that enables scrolling when matched.                      |
- * | `conditionDisable`   | `string` | The value of `conditionAttribute` that disables scrolling when matched.                     |
+ * | Property             | Type     | Description                                                                                                    |
+ * |----------------------|----------|----------------------------------------------------------------------------------------------------------------|
+ * | `conditionAttribute` | `string` | The CSS attribute to monitor (e.g., `'opacity'`, `'display'`).                                                 |
+ * | `conditionActive`    | `string` | The value of `conditionAttribute` that enables scrolling when matched.                                         |
+ * | `conditionDisable`   | `string` | The value of `conditionAttribute` that disables scrolling when matched.                                        |
  * 
  * ## Example
  * 
