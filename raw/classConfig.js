@@ -150,7 +150,6 @@
  * - The second configuration toggles the "hovered" and "not-hovered" classes on elements with the class "trigger-class" when hovered, allowing for switching actions.
  * - The third configuration adds the "visible" class and removes the "hidden" class when elements with the attribute "data-trigger" paired with their respective parents (having "data-parent") enter the viewport at a 50% threshold and exit at a 25% threshold. The `once` flag ensures the observer is disconnected after the first trigger.
  */
-
 class ComboClassConfigurator {
     /**
      * Constructs a new ComboClassConfigurator instance.
@@ -160,11 +159,9 @@ class ComboClassConfigurator {
      */
     constructor(configs) {
         // Validate that the provided configurations are an array
-        if (Array.isArray(configs)) {
-            this.initialConfigs = configs;
-        } else {
-            throw new Error("Invalid classConfigs parameter. An array is expected.");
-        }
+        Array.isArray(configs)
+            ? (this.initialConfigs = configs)
+            : (() => { throw new Error("Invalid classConfigs parameter. An array is expected."); })();
 
         /**
          * @type {Array<Object>}
@@ -179,11 +176,9 @@ class ComboClassConfigurator {
         this.scrollObservers = new Map();
 
         // Initialize setup when the DOM is ready
-        if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", () => this.setup());
-        } else {
-            this.setup();
-        }
+        document.readyState === "loading"
+            ? document.addEventListener("DOMContentLoaded", () => this.setup())
+            : this.setup();
     }
 
     /**
@@ -257,27 +252,25 @@ class ComboClassConfigurator {
                     : 1;
 
             // Handle special cases when topAddClasses are defined
-            if (mergedConfig.topAddClasses.length > 0) {
-                if (mergedConfig.removeClasses.length > 0) {
-                    console.warn(
+            mergedConfig.topAddClasses.length > 0 && (
+                mergedConfig.removeClasses.length > 0
+                    ? (console.warn(
                         `'removeClasses' should not be defined when 'topAddClasses' is set. It will be ignored.`
-                    );
-                    mergedConfig.removeClasses = [];
-                }
-                if (mergedConfig.switchAction) {
-                    console.warn(
+                      ),
+                      mergedConfig.removeClasses = [])
+                    : null,
+                mergedConfig.switchAction
+                    ? (console.warn(
                         `'switchAction' should not be defined when 'topAddClasses' is set. It will be set to false.`
-                    );
-                    mergedConfig.switchAction = false;
-                }
-            }
+                      ),
+                      mergedConfig.switchAction = false)
+                    : null
+            );
 
             // Process the configuration based on attribute pairing or repeat configuration
-            if (mergedConfig.triggerAttribut && mergedConfig.parentAttribut) {
-                this._processAttributeBasedPairing(mergedConfig);
-            } else {
-                this._processRepeatConfiguration(mergedConfig, repeatCount);
-            }
+            mergedConfig.triggerAttribut && mergedConfig.parentAttribut
+                ? this._processAttributeBasedPairing(mergedConfig)
+                : this._processRepeatConfiguration(mergedConfig, repeatCount);
         });
 
         // Initialize event listeners based on processed configurations
@@ -356,13 +349,9 @@ class ComboClassConfigurator {
         const map = new Map();
         elements.forEach(element => {
             const attrValue = element.getAttribute(attribute).trim();
-            if (attrValue) {
-                if (map.has(attrValue)) {
-                    map.get(attrValue).push(element);
-                } else {
-                    map.set(attrValue, [element]);
-                }
-            }
+            attrValue && (map.has(attrValue)
+                ? map.get(attrValue).push(element)
+                : map.set(attrValue, [element]));
         });
         return map;
     }
@@ -436,10 +425,7 @@ class ComboClassConfigurator {
                 if (delay > 0) {
                     clearTimeout(timeoutId);
                     timeoutId = setTimeout(() => {
-                        if (rafId !== null) {
-                            cancelAnimationFrame(rafId);
-                            rafId = null;
-                        }
+                        rafId !== null && (cancelAnimationFrame(rafId), rafId = null);
                         func(...argsCache);
                         argsCache = null;
                     }, delay);
@@ -471,12 +457,12 @@ class ComboClassConfigurator {
             let triggerElement = null;
 
             // Select the trigger element based on the configuration
-            if (config.triggerElement) {
+            config.triggerElement && (
                 triggerElement =
                     config.triggerElement instanceof Element
                         ? config.triggerElement
-                        : getElement(config.triggerElement);
-            }
+                        : getElement(config.triggerElement)
+            );
 
             // If the trigger element is specified but not found, skip this configuration
             if (config.triggerElement && !triggerElement) return;
@@ -486,13 +472,10 @@ class ComboClassConfigurator {
              */
             const addClassesDebounced = debounceHandler(
                 () => {
-                    if (!config.once || !config.classesAdded) {
-                        this._initClasses(config, "add");
-                        config.classesAdded = true;
-                        if (config.callback) {
-                            config.callback(triggerElement || null, "add");
-                        }
-                    }
+                    (!config.once || !config.classesAdded) &&
+                        (this._initClasses(config, "add"),
+                        config.classesAdded = true,
+                        config.callback && config.callback(triggerElement || null, "add"));
                 },
                 debounceDelay
             );
@@ -502,13 +485,10 @@ class ComboClassConfigurator {
              */
             const removeClassesDebounced = debounceHandler(
                 () => {
-                    if (!once) {
-                        this._initClasses(config, "remove");
-                        config.classesAdded = false;
-                        if (config.callback) {
-                            config.callback(triggerElement || null, "remove");
-                        }
-                    }
+                    !once &&
+                        (this._initClasses(config, "remove"),
+                        config.classesAdded = false,
+                        config.callback && config.callback(triggerElement || null, "remove"));
                 },
                 debounceDelay
             );
@@ -516,12 +496,9 @@ class ComboClassConfigurator {
             // Get the appropriate handler based on the event name
             const handler = eventHandlers.get(eventName);
 
-            if (handler) {
-                handler(triggerElement, config, addClassesDebounced, removeClassesDebounced, this._calculateThresholds(entryThreshold, exitThreshold));
-            } else {
-                // If no handler is found for the event, apply classes immediately
-                this._applyImmediateClasses(config);
-            }
+            handler
+                ? handler(triggerElement, config, addClassesDebounced, removeClassesDebounced, this._calculateThresholds(entryThreshold, exitThreshold))
+                : this._applyImmediateClasses(config);
         });
     }
 
@@ -536,9 +513,7 @@ class ComboClassConfigurator {
     _calculateThresholds(entry, exit) {
         const thresholds = new Set();
         thresholds.add(entry / 100);
-        if (exit !== null) {
-            thresholds.add(exit / 100);
-        }
+        exit !== null && thresholds.add(exit / 100);
         return Array.from(thresholds);
     }
 
@@ -571,10 +546,11 @@ class ComboClassConfigurator {
         const transition = action === "remove" && removeTransitionTime ? removeTransitionTime : transitionTime;
 
         // Select the parent element; default to document if not specified
-        let parent = document;
-        if (config.parentElement) {
-            parent = typeof config.parentElement === "string" ? getElement(config.parentElement) || document : config.parentElement;
-        }
+        const parent = config.parentElement
+            ? typeof config.parentElement === "string"
+                ? getElement(config.parentElement) || document
+                : config.parentElement
+            : document;
 
         // Select all target elements within the parent
         const targets = parent.querySelectorAll(targetClass);
@@ -587,32 +563,24 @@ class ComboClassConfigurator {
 
                 // Use requestAnimationFrame to ensure the transition is applied
                 requestAnimationFrame(() => {
-                    if (action === "remove") {
-                        if (config.topAddClasses.length > 0) {
-                            element.classList.remove(...config.topAddClasses, ...config.addClasses);
-                        } else {
-                            element.classList.remove(...removeClasses);
-                        }
-                    } else if (action === "add") {
-                        if (config.topAddClasses.length > 0) {
-                            const rect = element.getBoundingClientRect();
-                            const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-                            if (rect.bottom < 0) {
-                                element.classList.add(...config.topAddClasses);
-                                element.classList.remove(...config.addClasses);
-                            } else if (rect.top > viewportHeight) {
-                                element.classList.add(...addClasses);
-                                element.classList.remove(...config.topAddClasses);
-                            }
-                        } else {
-                            element.classList.add(...addClasses);
-                        }
-                    }
+                    action === "remove"
+                        ? topAddClasses.length > 0
+                            ? element.classList.remove(...topAddClasses, ...addClasses)
+                            : element.classList.remove(...removeClasses)
+                        : topAddClasses.length > 0
+                            ? (() => {
+                                const rect = element.getBoundingClientRect();
+                                const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+                                rect.bottom < 0
+                                    ? (element.classList.add(...topAddClasses), element.classList.remove(...addClasses))
+                                    : rect.top > viewportHeight
+                                        ? (element.classList.add(...addClasses), element.classList.remove(...topAddClasses))
+                                        : null;
+                            })()
+                            : element.classList.add(...addClasses);
 
                     // Execute the callback if provided
-                    if (config.callback) {
-                        config.callback(element, action);
-                    }
+                    config.callback && config.callback(element, action);
                 });
             }
         });
@@ -631,15 +599,9 @@ class ComboClassConfigurator {
     _handleClick(element, config, addCallback, removeCallback, thresholds) {
         element.addEventListener("click", () => {
             const action = config.classesAdded ? "remove" : "add";
-            if (action === "add") {
-                addCallback();
-            } else {
-                removeCallback();
-            }
+            action === "add" ? addCallback() : removeCallback();
             config.classesAdded = !config.classesAdded;
-            if (config.callback) {
-                config.callback(element, action);
-            }
+            config.callback && config.callback(element, action);
         });
     }
 
@@ -654,13 +616,11 @@ class ComboClassConfigurator {
      * @private
      */
     _handleHover(element, config, addCallback, removeCallback, thresholds) {
-        if (config.switchAction) {
-            element.addEventListener("mouseenter", removeCallback);
-            element.addEventListener("mouseleave", addCallback);
-        } else {
-            element.addEventListener("mouseenter", addCallback);
-            element.addEventListener("mouseleave", removeCallback);
-        }
+        config.switchAction
+            ? (element.addEventListener("mouseenter", removeCallback),
+               element.addEventListener("mouseleave", addCallback))
+            : (element.addEventListener("mouseenter", addCallback),
+               element.addEventListener("mouseleave", removeCallback));
     }
 
     /**
@@ -683,7 +643,7 @@ class ComboClassConfigurator {
         let observer = this.scrollObservers.get(observerConfig);
 
         // Create a new IntersectionObserver if one doesn't exist for the current configuration
-        if (!observer) {
+        !observer && (
             observer = new IntersectionObserver(entries => {
                 entries.forEach(entry => {
                     const target = entry.target;
@@ -701,44 +661,34 @@ class ComboClassConfigurator {
 
                         const ratio = entry.intersectionRatio;
 
-                        if (topAddClasses.length > 0) {
-                            const rect = target.getBoundingClientRect();
-                            const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-                            if (rect.bottom < 0) {
-                                debouncedInit();
-                            } else if (rect.top > viewportHeight) {
-                                debouncedRemove();
-                            }
-                        } else if (switchAction) {
-                            if (ratio >= entryThreshold / 100) {
-                                debouncedRemove();
-                            }
-                            if (exitThreshold !== null && ratio < exitThreshold / 100) {
-                                debouncedInit();
-                            }
-                        } else {
-                            if (ratio >= entryThreshold / 100) {
-                                debouncedInit();
-                            }
-                            if (exitThreshold !== null && ratio < exitThreshold / 100) {
-                                debouncedRemove();
-                            }
-                        }
+                        topAddClasses.length > 0
+                            ? (() => {
+                                const rect = target.getBoundingClientRect();
+                                const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+                                rect.bottom < 0
+                                    ? debouncedInit()
+                                    : rect.top > viewportHeight
+                                        ? debouncedRemove()
+                                        : null;
+                            })()
+                            : switchAction
+                                ? (ratio >= entryThreshold / 100 ? debouncedRemove() : null,
+                                   exitThreshold !== null && ratio < exitThreshold / 100 ? debouncedInit() : null)
+                                : (ratio >= entryThreshold / 100 ? debouncedInit() : null,
+                                   exitThreshold !== null && ratio < exitThreshold / 100 ? debouncedRemove() : null);
                     });
                 });
             }, {
                 threshold: thresholds
-            });
-
-            // Store the observer for future use
-            this.scrollObservers.set(observerConfig, observer);
-        }
+            }),
+            this.scrollObservers.set(observerConfig, observer)
+        );
 
         // Initialize the __comboClassConfigs property on the element if not already present
-        if (!element.__comboClassConfigs) {
-            element.__comboClassConfigs = [];
-            observer.observe(element);
-        }
+        !element.__comboClassConfigs && (
+            element.__comboClassConfigs = [],
+            observer.observe(element)
+        );
 
         // Add the current configuration to the element's config list
         element.__comboClassConfigs.push({
@@ -748,19 +698,17 @@ class ComboClassConfigurator {
         });
 
         // If the configuration is set to execute only once, modify the callback to unobserve after execution
-        if (config.once) {
-            const originalCallback = config.callback;
-            config.callback = (el, action) => {
-                if (originalCallback) originalCallback(el, action);
-                if (action === "remove") {
-                    observer.unobserve(el);
-                    const index = el.__comboClassConfigs.indexOf(config);
-                    if (index > -1) {
-                        el.__comboClassConfigs.splice(index, 1);
-                    }
+        config.once && (
+            config.callback = config.callback
+                ? (el, action) => {
+                    config.callback(el, action);
+                    action === "remove" && (
+                        observer.unobserve(el),
+                        el.__comboClassConfigs.splice(el.__comboClassConfigs.indexOf(config), 1)
+                    );
                 }
-            };
-        }
+                : null
+        );
     }
 
     /**
@@ -770,18 +718,11 @@ class ComboClassConfigurator {
      * @private
      */
     _applyImmediateClasses(config) {
-        if (config.topAddClasses.length > 0) {
-            this._initClasses(config, "add");
-            config.classesAdded = true;
-        } else if (config.addClasses.length > 0) {
-            this._initClasses(config, "add");
-            config.classesAdded = true;
-        }
+        config.topAddClasses.length > 0
+            ? (this._initClasses(config, "add"), config.classesAdded = true)
+            : config.addClasses.length > 0 && (this._initClasses(config, "add"), config.classesAdded = true);
 
-        if (config.removeClasses.length > 0) {
-            this._initClasses(config, "remove");
-            config.classesAdded = false;
-        }
+        config.removeClasses.length > 0 && (this._initClasses(config, "remove"), config.classesAdded = false);
     }
 }
 
