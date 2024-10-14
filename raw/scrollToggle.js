@@ -33,10 +33,10 @@
  * | Option             | Type     | Description                                                                                   |
  * |--------------------|----------|-----------------------------------------------------------------------------------------------|
  * | `checkEvent`       | `string` | The event type to listen for. Possible values: `'scroll'`, `'click'`, `'hover'`.              |
- * | `hoverTriggers`    | `array`  | (Optional) An array of class names to attach hover event listeners to.                         |
- * | `triggerElements`  | `array`  | (Optional) An array of element IDs to attach the primary event listeners to.                   |
- * | `conditionElements`| `array`  | An array of element IDs whose CSS attributes will be checked against specified conditions.     |
- * | `conditionArray`   | `array`  | An array of condition objects defining the attributes to check and their target values.        |
+ * | `hoverTriggers`    | `array`  | (Optional) An array of class names to attach hover event listeners to.                        |
+ * | `triggerElements`  | `array`  | (Optional) An array of element IDs to attach the primary event listeners to.                  |
+ * | `conditionElements`| `array`  | An array of element IDs whose CSS attributes will be checked against specified conditions.    |
+ * | `conditionArray`   | `array`  | An array of condition objects defining the attributes to check and their target values.       |
  * 
  * ### Condition Object Structure
  * 
@@ -44,9 +44,9 @@
  * 
  * | Property             | Type     | Description                                                                                 |
  * |----------------------|----------|---------------------------------------------------------------------------------------------|
- * | `conditionAttribute` | `string` | The CSS attribute to monitor (e.g., `'opacity'`, `'display'`).                             |
- * | `conditionActive`    | `string` | The value of `conditionAttribute` that enables scrolling when matched.                     |
- * | `conditionDisable`   | `string` | The value of `conditionAttribute` that disables scrolling when matched.                    |
+ * | `conditionAttribute` | `string` | The CSS attribute to monitor (e.g., `'opacity'`, `'display'`).                              |
+ * | `conditionActive`    | `string` | The value of `conditionAttribute` that enables scrolling when matched.                      |
+ * | `conditionDisable`   | `string` | The value of `conditionAttribute` that disables scrolling when matched.                     |
  * 
  * ## Example
  * 
