@@ -1,23 +1,166 @@
 /**
- * @typedef {Object} ToggleHeightConfig
- * @property {string} [parentSelector] - Selector für die übergeordneten Elemente, die Trigger und Targets enthalten (z.B. '.faq-container').
- * Falls nicht angegeben, wird das gesamte Dokument verwendet.
- *
- * @property {string} triggerSelector - **(Erforderlich)** Selector für die Elemente, die als Trigger fungieren, um die Höhe umzuschalten (z.B. '.faq-p').
- * @property {string} targetSelector - **(Erforderlich)** Selector für die Elemente, deren Höhe umgeschaltet wird (z.B. '.faq-body').
- * @property {string} [rotateSelector] - Selector für die Elemente, die sich drehen, wenn der Trigger geklickt wird (z.B. '.rotate-arrow'). Optional.
- * @property {boolean} [isOpen=false] - Bestimmt, ob die Target-Elemente standardmäßig geöffnet sein sollen.
- * @property {number} [duration=300] - Dauer der Höhen-Transition in Millisekunden.
- * @property {boolean} [closeOthers=true] - Wenn `true`, wird das Öffnen eines Targets andere innerhalb derselben Konfiguration schließen.
- * @property {string} [easingMode='ease'] - CSS-Easing-Funktion für die Transitions (z.B. 'ease', 'ease-in', 'ease-out', 'ease-in-out').
- * @property {number} [fontSizeMultiplier=1] - **(Optional)** Multiplikator für die Root-`fontSize`, der zur Berechnung der kollabierten Höhe verwendet wird.
- * @property {number} [expandedRotation=90] - **(Optional)** Der Rotationswinkel in Grad, wenn das Element erweitert wird.
- */
-
-/**
- * Klasse verantwortlich für das Umschalten der Höhe von Elementen mit sanften Übergängen.
+ * ToggleHeight Class
+ * 
+ * The `ToggleHeight` class enables smooth height toggling of DOM elements, making it ideal for FAQ sections, accordions, and similar UI components where content needs to be expanded or collapsed. This class supports configurable trigger elements, target elements, rotation elements, and offers options for duration, easing, and more.
+ * 
+ * @version 1.0.0
+ * @license MIT
+ * 
+ * ## Usage
+ * 
+ * Include this script via a CDN or local file, then instantiate the `ToggleHeight` class with the desired configuration options.
+ * 
+ * ```html
+ * <div class="faq-container">
+ *     <div class="faq-item">
+ *         <div class="faq-question">
+ *             What is your return policy?
+ *             <span class="faq-icon">▼</span>
+ *         </div>
+ *         <div class="faq-answer">
+ *             Our return policy allows you to return items within 30 days of purchase.
+ *         </div>
+ *     </div>
+ *     <div class="faq-item">
+ *         <div class="faq-question">
+ *             How can I contact customer service?
+ *             <span class="faq-icon">▼</span>
+ *         </div>
+ *         <div class="faq-answer">
+ *             You can reach our customer service via email at support@example.com.
+ *         </div>
+ *     </div>
+ * </div>
+ * ```
+ * 
+ * ```javascript
+ * const toggleConfigs = [
+ *     {
+ *         parentSelector: '.faq-container',
+ *         triggerSelector: '.faq-question',
+ *         targetSelector: '.faq-answer',
+ *         rotateSelector: '.faq-icon',
+ *         isOpen: false,
+ *         duration: 300,
+ *         closeOthers: true,
+ *         easingMode: 'ease-in-out',
+ *         fontSizeMultiplier: 1,
+ *         expandedRotation: 90
+ *     }
+ * ];
+ * 
+ * // Initialize the ToggleHeight class with the provided configurations
+ * const toggleHeight = new ToggleHeight(toggleConfigs);
+ * ```
+ * 
+ * ## Configuration Options
+ * 
+ * Each configuration object within the `configs` array can have the following properties:
+ * 
+ * | Property              | Type                 | Description                                                                                                                                                     |
+ * |-----------------------|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | `parentSelector`     | `string`             | Selector for the parent elements that contain triggers and targets (e.g., `.faq-container`). If not specified, the entire document is used.                     |
+ * | `triggerSelector`    | `string` **(Required)** | Selector for the elements that act as triggers to toggle the height (e.g., `.faq-question`).                                                                      |
+ * | `targetSelector`     | `string` **(Required)** | Selector for the elements whose height will be toggled (e.g., `.faq-answer`).                                                                                     |
+ * | `rotateSelector`     | `string`             | Selector for the elements that should rotate when the trigger is clicked (e.g., `.faq-icon`). Optional.                                                        |
+ * | `isOpen`             | `boolean`            | Determines whether the target elements should be open by default. Default is `false`.                                                                              |
+ * | `duration`           | `number`             | Duration of the height transition in milliseconds. Default is `300`.                                                                                                |
+ * | `closeOthers`        | `boolean`            | If `true`, opening one target will close others within the same configuration. Default is `true`.                                                                  |
+ * | `easingMode`         | `string`             | CSS easing function for the transitions (e.g., `ease`, `ease-in`, `ease-out`, `ease-in-out`). Default is `'ease'`.                                                 |
+ * | `fontSizeMultiplier` | `number`             | **(Optional)** Multiplier for the root `font-size` used to calculate the collapsed height. Default is `1`.                                                         |
+ * | `expandedRotation`   | `number`             | **(Optional)** The rotation angle in degrees when the element is expanded. Default is `90`.                                                                         |
+ * 
+ * ### Notes
+ * 
+ * - **Parent Selector**: Allows grouping of trigger and target elements within a common container.
+ * - **Rotate Selector**: Useful for icons or arrows that should rotate to indicate the expanded/collapsed state.
+ * - **Close Others**: Ideal for accordion behavior where only one section should be open at a time.
+ * - **Font Size Multiplier**: Enables dynamic adjustment of the collapsed height based on the root font size, enhancing responsiveness.
+ * - **Expanded Rotation**: Controls the rotation angle of the rotation element to provide visual feedback.
+ * - **Touch Support**: The class includes touch event handling to ensure functionality on touch devices.
+ * 
+ * ## Methods
+ * 
+ * | Method                                  | Description                                                                                                                   |
+ * |-----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+ * | `constructor(configs)`                  | Initializes the class with the provided configurations and sets up the necessary event listeners.                             |
+ * | `getRootFontSize()`                     | Retrieves the root font size of the document in pixels.                                                                       |
+ * | `getCollapsedHeight(config)`            | Calculates the collapsed height based on the root font size and the multiplier.                                               |
+ * | `domContentLoadedHandler()`             | Handler for the `DOMContentLoaded` event. Initializes all configurations and sets up the window resize listener.              |
+ * | `initConfig(config)`                    | Initializes a single configuration by selecting DOM elements and setting up event listeners.                                  |
+ * | `initElement(element, config)`          | Initializes the styles of the target element for height transitions.                                                          |
+ * | `handleToggle(index, target, rotateElement, config)` | Handles the toggle action when a trigger is activated.                                                        |
+ * | `expand(target, rotateElement, config)` | Expands the target element to its full height.                                                                                |
+ * | `collapse(target, rotateElement, config)` | Collapses the target element to the calculated height.                                                                     |
+ * | `rotate(element, degrees, duration, easingMode)` | Rotates an element to a specified degree.                                                                              |
+ * | `onWindowResize()`                      | Handles window resize events to adjust the heights of open and collapsed elements accordingly.                                 |
+ * 
+ * ## Example
+ * 
+ * ```html
+ * <div class="faq-container">
+ *     <div class="faq-item">
+ *         <div class="faq-question">
+ *             What is your return policy?
+ *             <span class="faq-icon">▼</span>
+ *         </div>
+ *         <div class="faq-answer">
+ *             Our return policy allows you to return items within 30 days of purchase.
+ *         </div>
+ *     </div>
+ *     <div class="faq-item">
+ *         <div class="faq-question">
+ *             How can I contact customer service?
+ *             <span class="faq-icon">▼</span>
+ *         </div>
+ *         <div class="faq-answer">
+ *             You can reach our customer service via email at support@example.com.
+ *         </div>
+ *     </div>
+ * </div>
+ * ```
+ * 
+ * ```javascript
+ * const toggleConfigs = [
+ *     {
+ *         parentSelector: '.faq-container',
+ *         triggerSelector: '.faq-question',
+ *         targetSelector: '.faq-answer',
+ *         rotateSelector: '.faq-icon',
+ *         isOpen: false,
+ *         duration: 300,
+ *         closeOthers: true,
+ *         easingMode: 'ease-in-out',
+ *         fontSizeMultiplier: 1,
+ *         expandedRotation: 90
+ *     }
+ * ];
+ * 
+ * // Initialize the ToggleHeight class with the provided configurations
+ * const toggleHeight = new ToggleHeight(toggleConfigs);
+ * ```
+ * 
+ * In this example:
+ * 
+ * - **HTML Structure**: Each FAQ consists of a question (`.faq-question`) and an answer (`.faq-answer`). An icon (`.faq-icon`) indicates the state.
+ * - **Configuration**:
+ *   - **Parent Selector**: `.faq-container` groups all FAQ items.
+ *   - **Trigger Selector**: `.faq-question` are the clickable areas that toggle the answers.
+ *   - **Target Selector**: `.faq-answer` are the areas whose height is toggled.
+ *   - **Rotate Selector**: `.faq-icon` rotates when the answer is expanded.
+ *   - **Close Others**: When opening an answer, other answers within the container are closed.
+ * 
+ * ## License
+ * 
+ * This code is licensed under the MIT License. You are free to use, modify, and distribute it as you wish.
  */
 class ToggleHeight {
+    /**
+     * Constructs a new ToggleHeight instance.
+     * 
+     * @param {Array<ToggleHeightConfig>} configs - An array of configuration objects for height toggling.
+     * @throws {Error} Throws an error if the provided configurations are not an array.
+     */
     constructor(configs) {
         if (!Array.isArray(configs)) {
             configs = [configs];
@@ -31,7 +174,7 @@ class ToggleHeight {
             touchStartY: 0,
             currentOpenIndex: null,
             fontSizeMultiplier: config.fontSizeMultiplier !== undefined ? config.fontSizeMultiplier : 1,
-            expandedRotation: config.expandedRotation !== undefined ? config.expandedRotation : 90 // Neuer Parameter
+            expandedRotation: config.expandedRotation !== undefined ? config.expandedRotation : 90 // New parameter
         }));
 
         this.domContentLoadedHandler = this.domContentLoadedHandler.bind(this);
@@ -39,8 +182,8 @@ class ToggleHeight {
     }
 
     /**
-     * Holt die Root-FontSize des Dokuments in Pixeln.
-     * @returns {number} Die Root-FontSize als Zahl (z.B. 16).
+     * Retrieves the root font size of the document in pixels.
+     * @returns {number} The root font size as a number (e.g., 16).
      * @private
      */
     getRootFontSize() {
@@ -49,9 +192,9 @@ class ToggleHeight {
     }
 
     /**
-     * Berechnet die kollabierte Höhe basierend auf der Root-FontSize und dem Multiplikator.
-     * @param {ToggleHeightConfig} config - Die aktuelle Konfiguration.
-     * @returns {string} Die kollabierte Höhe als Zeichenkette mit Einheit (z.B. '16px').
+     * Calculates the collapsed height based on the root font size and the multiplier.
+     * @param {ToggleHeightConfig} config - The current configuration.
+     * @returns {string} The collapsed height as a string with unit (e.g., '16px').
      * @private
      */
     getCollapsedHeight(config) {
@@ -61,7 +204,7 @@ class ToggleHeight {
     }
 
     /**
-     * Handler für das DOMContentLoaded-Ereignis. Initialisiert alle Konfigurationen und richtet den Fenster-Resize-Listener ein.
+     * Handler for the DOMContentLoaded event. Initializes all configurations and sets up the window resize listener.
      * @private
      */
     domContentLoadedHandler() {
@@ -73,8 +216,8 @@ class ToggleHeight {
     }
 
     /**
-     * Initialisiert eine einzelne Konfiguration, indem DOM-Elemente ausgewählt und Event-Listener eingerichtet werden.
-     * @param {ToggleHeightConfig} config - Das Konfigurationsobjekt, das initialisiert werden soll.
+     * Initializes a single configuration by selecting DOM elements and setting up event listeners.
+     * @param {ToggleHeightConfig} config - The configuration object to initialize.
      * @private
      */
     initConfig(config) {
@@ -88,11 +231,11 @@ class ToggleHeight {
             closeOthers = true,
             easingMode = 'ease',
             fontSizeMultiplier = 1,
-            expandedRotation = 90 // Neuer Parameter
+            expandedRotation = 90 // New parameter
         } = config;
 
         if (!triggerSelector || !targetSelector) {
-            console.error('triggerSelector und targetSelector sind in ToggleHeightConfig erforderlich.');
+            console.error('triggerSelector and targetSelector are required in ToggleHeightConfig.');
             return;
         }
 
@@ -106,7 +249,7 @@ class ToggleHeight {
         config.closeOthers = closeOthers;
         config.easingMode = easingMode;
         config.fontSizeMultiplier = fontSizeMultiplier;
-        config.expandedRotation = expandedRotation; // Neuer Parameter setzen
+        config.expandedRotation = expandedRotation; // Set new parameter
 
         config.parents.forEach(parent => {
             const triggersInParent = parent.querySelectorAll(triggerSelector);
@@ -147,9 +290,9 @@ class ToggleHeight {
     }
 
     /**
-     * Initialisiert die Stile des Target-Elements für Höhen-Transitions.
-     * @param {HTMLElement} element - Das Element, dessen Höhe umgeschaltet wird.
-     * @param {ToggleHeightConfig} config - Die aktuelle Konfiguration.
+     * Initializes the styles of the target element for height transitions.
+     * @param {HTMLElement} element - The element whose height will be toggled.
+     * @param {ToggleHeightConfig} config - The current configuration.
      * @private
      */
     initElement(element, config) {
@@ -163,11 +306,11 @@ class ToggleHeight {
     }
 
     /**
-     * Handhabt die Umschaltaktion, wenn ein Trigger aktiviert wird.
-     * @param {number} index - Der Index des aktivierten Triggers.
-     * @param {HTMLElement} target - Das Ziel-Element, das umgeschaltet wird.
-     * @param {HTMLElement|null} rotateElement - Das Element, das rotiert werden soll, falls vorhanden.
-     * @param {ToggleHeightConfig} config - Die aktuelle Konfiguration.
+     * Handles the toggle action when a trigger is activated.
+     * @param {number} index - The index of the activated trigger.
+     * @param {HTMLElement} target - The target element to be toggled.
+     * @param {HTMLElement|null} rotateElement - The element to rotate, if any.
+     * @param {ToggleHeightConfig} config - The current configuration.
      * @private
      */
     handleToggle(index, target, rotateElement, config) {
@@ -197,10 +340,10 @@ class ToggleHeight {
     }
 
     /**
-     * Erweitert das Ziel-Element auf seine volle Höhe.
-     * @param {HTMLElement} target - Das Element, das erweitert wird.
-     * @param {HTMLElement|null} rotateElement - Das Element, das rotiert werden soll, falls vorhanden.
-     * @param {ToggleHeightConfig} config - Die aktuelle Konfiguration.
+     * Expands the target element to its full height.
+     * @param {HTMLElement} target - The element to expand.
+     * @param {HTMLElement|null} rotateElement - The element to rotate, if any.
+     * @param {ToggleHeightConfig} config - The current configuration.
      * @private
      */
     expand(target, rotateElement, config) {
@@ -212,10 +355,10 @@ class ToggleHeight {
     }
 
     /**
-     * Kollabiert das Ziel-Element auf die berechnete Höhe basierend auf der Root-FontSize und dem Multiplikator.
-     * @param {HTMLElement} target - Das Element, das kollabiert wird.
-     * @param {HTMLElement|null} rotateElement - Das Element, das rotiert werden soll, falls vorhanden.
-     * @param {ToggleHeightConfig} config - Die aktuelle Konfiguration.
+     * Collapses the target element to the calculated height based on the root font size and multiplier.
+     * @param {HTMLElement} target - The element to collapse.
+     * @param {HTMLElement|null} rotateElement - The element to rotate, if any.
+     * @param {ToggleHeightConfig} config - The current configuration.
      * @private
      */
     collapse(target, rotateElement, config) {
@@ -227,11 +370,11 @@ class ToggleHeight {
     }
 
     /**
-     * Rotiert ein Element auf einen angegebenen Grad.
-     * @param {HTMLElement} element - Das Element, das rotiert werden soll.
-     * @param {number} degrees - Der Grad, auf den das Element rotiert werden soll.
-     * @param {number} duration - Dauer der Rotations-Transition in Millisekunden.
-     * @param {string} easingMode - CSS-Easing-Funktion für die Rotations-Transition.
+     * Rotates an element to a specified degree.
+     * @param {HTMLElement} element - The element to rotate.
+     * @param {number} degrees - The degree to rotate the element to.
+     * @param {number} duration - Duration of the rotation transition in milliseconds.
+     * @param {string} easingMode - CSS easing function for the rotation transition.
      * @private
      */
     rotate(element, degrees, duration, easingMode) {
@@ -240,7 +383,7 @@ class ToggleHeight {
     }
 
     /**
-     * Handhabt Fenster-Resize-Ereignisse, um die Höhe von offenen und kollabierten Elementen anzupassen.
+     * Handles window resize events to adjust the heights of open and collapsed elements accordingly.
      * @private
      */
     onWindowResize() {
@@ -251,20 +394,20 @@ class ToggleHeight {
                 const isOpen = parseFloat(target.style.height) > parseFloat(newCollapsedHeight);
 
                 if (isOpen) {
-                    // Element ist geöffnet, aktualisiere seine Höhe basierend auf dem neuen scrollHeight
+                    // Element is open, update its height based on the new scrollHeight
                     const originalTransition = target.style.transition;
                     target.style.transition = 'none';
                     target.style.height = `${target.scrollHeight}px`;
-                    // Trigger Reflow
+                    // Trigger reflow
                     target.offsetHeight;
                     target.style.transition = originalTransition;
                 } else {
-                    // Element ist kollabiert, aktualisiere seine Höhe basierend auf dem neuen multiplikator
+                    // Element is collapsed, update its height based on the new multiplier
                     target.style.transition = 'height 0ms';
                     target.style.height = newCollapsedHeight;
-                    // Trigger Reflow
+                    // Trigger reflow
                     target.offsetHeight;
-                    // Wiederherstellung der Transition
+                    // Restore the transition
                     target.style.transition = `height ${config.duration}ms ${config.easingMode}`;
                 }
             });
@@ -272,4 +415,5 @@ class ToggleHeight {
     }
 }
 
+// Expose the ToggleHeight class for external access
 window.ToggleHeight = ToggleHeight;
