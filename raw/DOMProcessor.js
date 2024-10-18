@@ -177,7 +177,7 @@
 
 class DOMProcessor {
     /**
-     * Initializes the DOMProcessor with the provided configurations.
+     * Initializes the DOMProcessor with one or more configurations.
      * 
      * @param {...Object} configs - One or more configuration objects for the DOMProcessor.
      */
@@ -259,7 +259,18 @@ class DOMProcessor {
 
                 sourceGroups.forEach((sourceGroup) => {
                     // Find all child elements with source-txt or source-img attributes
-                    const child3Elements = sourceGroup.querySelectorAll(sourceAttributes.map(attr => `[${attr.sourceContainerAttributeTxt}], [${attr.sourceContainerAttributeImg}]`).join(', '));
+                    const childSelectors = sourceAttributes.map(attr => {
+                        let selectors = [];
+                        if (attr.sourceContainerAttributeTxt) {
+                            selectors.push(`[${attr.sourceContainerAttributeTxt}]`);
+                        }
+                        if (attr.sourceContainerAttributeImg) {
+                            selectors.push(`[${attr.sourceContainerAttributeImg}]`);
+                        }
+                        return selectors.join(', ');
+                    }).filter(selector => selector).join(', ');
+                    
+                    const child3Elements = sourceGroup.querySelectorAll(childSelectors);
                     if (child3Elements.length === 0) return; // No relevant elements found
 
                     // Clone the template
@@ -308,7 +319,7 @@ class DOMProcessor {
 
     /**
      * Transfers content from a source element to the corresponding target element
-     * in the cloned template.
+     * in the cloned template based on the provided attribute mappings.
      * 
      * @param {HTMLElement} child3 - The source element with content to transfer.
      * @param {HTMLElement} clonedTargetParent - The cloned template element.
@@ -318,12 +329,13 @@ class DOMProcessor {
         // Determine the type and key
         let type, key, value, targetAttribute;
         sourceAttributes.forEach(attr => {
-            if (child3.hasAttribute(attr.sourceContainerAttributeTxt)) {
+            if (attr.sourceContainerAttributeTxt && child3.hasAttribute(attr.sourceContainerAttributeTxt)) {
                 type = 'txt';
                 key = child3.getAttribute(attr.sourceContainerAttributeTxt);
                 value = child3.textContent;
                 targetAttribute = attr.targetContainerAttributeTxt;
-            } else if (child3.hasAttribute(attr.sourceContainerAttributeImg)) {
+            }
+            if (attr.sourceContainerAttributeImg && child3.hasAttribute(attr.sourceContainerAttributeImg)) {
                 type = 'img';
                 key = child3.getAttribute(attr.sourceContainerAttributeImg);
                 value = child3.src;
