@@ -36,7 +36,7 @@
  *     },
  *     {
  *         eventName: "scrollInView",
- *         parentAttribut: "data-parent",
+ *         parentAttribute: "data-parent",
  *         triggerAttribut: "data-trigger",
  *         entryThreshold: 50,
  *         exitThreshold: 25,
@@ -69,7 +69,7 @@
  * | `switchAction`        | `boolean`           | If `true`, toggles between adding and removing classes on events. Default is `false`.                       |
  * | `repeatConfiguration` | `number`            | The number of times to repeat the configuration for multiple elements. Must be >= 1. Default is `1`.        |
  * | `triggerAttribut`     | `string`            | The attribute name used for pairing trigger elements.                                                       |
- * | `parentAttribut`      | `string`            | The attribute name used for pairing parent elements.                                                        |
+ * | `parentAttribute`      | `string`            | The attribute name used for pairing parent elements.                                                        |
  * | `callback`            | `Function|null`     | A callback function executed after classes are added or removed.                                            |
  * | `classesAdded`        | `boolean`           | Internal flag indicating if classes have been added. Default is `false`.                                    |
  * | `start`               | `number`            | The starting index for class manipulation. Default is `1`.                                                  |
@@ -81,7 +81,7 @@
  * 
  * ### Notes
  * 
- * - When using attribute-based pairing (`triggerAttribut` and `parentAttribut`), elements must have the corresponding attributes with matching values to establish the pairing.
+ * - When using attribute-based pairing (`triggerAttribut` and `parentAttribute`), elements must have the corresponding attributes with matching values to establish the pairing.
  * - The `debounce` parameter helps in controlling the frequency of class manipulations, especially useful for events that can fire rapidly like scroll or resize.
  * - The `callback` function, if provided, is executed after classes are added or removed, allowing for additional custom behavior.
  * - The `once` parameter ensures that certain class manipulations occur only once, useful for animations or one-time effects.
@@ -130,7 +130,7 @@
  *     },
  *     {
  *         eventName: "scrollInView",
- *         parentAttribut: "data-parent",
+ *         parentAttribute: "data-parent",
  *         triggerAttribut: "data-trigger",
  *         entryThreshold: 50,
  *         exitThreshold: 25,
@@ -206,7 +206,7 @@ class ComboClassConfigurator {
             switchAction: false,
             repeatConfiguration: 1,
             triggerAttribut: "",
-            parentAttribut: "",
+            parentAttribute: "",
             callback: null,
             classesAdded: false,
             start: 1,
@@ -268,7 +268,7 @@ class ComboClassConfigurator {
             );
 
             // Process the configuration based on attribute pairing or repeat configuration
-            mergedConfig.triggerAttribut && mergedConfig.parentAttribut
+            mergedConfig.triggerAttribut && mergedConfig.parentAttribute
                 ? this._processAttributeBasedPairing(mergedConfig)
                 : this._processRepeatConfiguration(mergedConfig, repeatCount);
         });
@@ -310,11 +310,11 @@ class ComboClassConfigurator {
      */
     _processAttributeBasedPairing(config) {
         // Select all parent and trigger elements based on their attributes
-        const parentElements = document.querySelectorAll(`[${config.parentAttribut}]`);
+        const parentElements = document.querySelectorAll(`[${config.parentAttribute}]`);
         const triggerElements = document.querySelectorAll(`[${config.triggerAttribut}]`);
 
         // Map elements by their attribute values
-        const parentMap = this._mapElementsByAttribute(parentElements, config.parentAttribut);
+        const parentMap = this._mapElementsByAttribute(parentElements, config.parentAttribute);
         const triggerMap = this._mapElementsByAttribute(triggerElements, config.triggerAttribut);
 
         // Pair parent and trigger elements based on matching attribute values
@@ -329,7 +329,7 @@ class ComboClassConfigurator {
                             triggerElement: trigger,
                             repeatConfiguration: 1,
                             triggerAttribut: "",
-                            parentAttribut: ""
+                            parentAttribute: ""
                         });
                     });
                 });
