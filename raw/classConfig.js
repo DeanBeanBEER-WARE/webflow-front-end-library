@@ -69,7 +69,7 @@
  * | `switchAction`        | `boolean`           | If `true`, toggles between adding and removing classes on events. Default is `false`.                       |
  * | `repeatConfiguration` | `number`            | The number of times to repeat the configuration for multiple elements. Must be >= 1. Default is `1`.        |
  * | `triggerAttribut`     | `string`            | The attribute name used for pairing trigger elements.                                                       |
- * | `parentAttribute`      | `string`            | The attribute name used for pairing parent elements.                                                        |
+ * | `parentAttribute`      | `string`            | The attribute name used for pairing parent elements.                                                       |
  * | `callback`            | `Function|null`     | A callback function executed after classes are added or removed.                                            |
  * | `classesAdded`        | `boolean`           | Internal flag indicating if classes have been added. Default is `false`.                                    |
  * | `start`               | `number`            | The starting index for class manipulation. Default is `1`.                                                  |
