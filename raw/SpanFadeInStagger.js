@@ -6,6 +6,7 @@ class SpanFadeInStagger {
         this.threshold = config.threshold || 0.5;
         this.staggerDelay = config.staggerDelay || 100;
         this.repeat = config.repeat || false;
+        this.tokenSizeWord = config.tokenSizeWord || false;
         this.responsive = config.responsive || false;
         this.observers = new Map();
 
@@ -29,13 +30,12 @@ class SpanFadeInStagger {
         this.textIDs.forEach(textID => {
             const textElement = document.getElementById(textID);
             if (!textElement) {
-                console.error(`Element mit ID "${textID}" nicht gefunden.`);
+                console.error(`Element with ID "${textID}" not found.`);
                 return;
             }
 
             if (this.observers.has(textID)) {
-                const oldObserver = this.observers.get(textID);
-                oldObserver.disconnect();
+                this.observers.get(textID).disconnect();
                 this.observers.delete(textID);
             }
 
@@ -44,26 +44,26 @@ class SpanFadeInStagger {
             }
 
             this.unwrapSpans(textElement);
-            this.wrapLinesInSpans(textElement);
+            this.tokenSizeWord ? this.wrapWordsInSpans(textElement) : this.wrapLinesInSpans(textElement);
             textElement.style.overflow = 'hidden';
-            const spans = Array.from(textElement.querySelectorAll('span.line-span'));
+            const spans = this.tokenSizeWord
+                ? Array.from(textElement.querySelectorAll('span.word-span'))
+                : Array.from(textElement.querySelectorAll('span.line-span'));
 
-            if (spans.length === 0) {
-                console.warn(`Keine Zeilenspans innerhalb des Elements mit ID "${textID}" gefunden.`);
-                return;
-            }
+            spans.length === 0
+                ? console.warn(`No ${this.tokenSizeWord ? 'word' : 'line'} spans found within element with ID "${textID}".`)
+                : spans.forEach(span => {
+                    span.style.display = this.tokenSizeWord ? 'inline-block' : 'block';
+                    if (this.tokenSizeWord) {
+                        span.style.whiteSpace = 'pre-wrap';
+                    }
+                    span.style.opacity = '0';
+                    span.style.transform = 'translateY(20px)';
+                    span.style.transition = `opacity ${this.transition} ${this.easing}, transform ${this.transition} ${this.easing}`;
+                    span.style.willChange = 'opacity, transform';
+                });
 
-            spans.forEach(span => {
-                span.style.display = 'block';
-                span.style.opacity = '0';
-                span.style.transform = 'translateY(20px)';
-                span.style.transition = `opacity ${this.transition} ${this.easing}, transform ${this.transition} ${this.easing}`;
-                span.style.willChange = 'opacity, transform';
-            });
-
-            const observerOptions = {
-                threshold: this.threshold
-            };
+            const observerOptions = { threshold: this.threshold };
 
             const observer = new IntersectionObserver((entries, observerInstance) => {
                 entries.forEach(entry => {
@@ -141,6 +141,27 @@ class SpanFadeInStagger {
             line.spans.forEach(wordSpan => {
                 lineSpan.appendChild(wordSpan);
             });
+        });
+    }
+
+    wrapWordsInSpans(element) {
+        const textNodes = this.getTextNodes(element);
+        const wordSpans = [];
+
+        textNodes.forEach(node => {
+            const words = node.textContent.split(/(\s+)/);
+            for(let i = 0; i < words.length; i++) {
+                const word = words[i];
+                if(word.trim() !== '') {
+                    const space = (i + 1 < words.length && words[i + 1].trim() === '') ? words[i + 1] : '';
+                    const span = document.createElement('span');
+                    span.textContent = word + space;
+                    span.classList.add('word-span');
+                    element.insertBefore(span, node);
+                    wordSpans.push(span);
+                }
+            }
+            element.removeChild(node);
         });
     }
 
