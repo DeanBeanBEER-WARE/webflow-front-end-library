@@ -1,38 +1,35 @@
 /**
  * ScrollManager Class
  *
- * Enables or disables page scrolling based on specified CSS conditions and custom events,
- * and animates scrolling using easing functions.
+ * Enables/disables page scrolling based on specified conditions and animates scrolling using easing functions.
  *
  * Options:
- * - scrollSpeed (number): Number of pixels to scroll per event. Default: 100.
- * - smoothScrollFactor (number): Factor (0-100) determining the smoothness of the scroll animation. Default: 50.
- * - pageWrapper (string): ID of the page wrapper element containing scrollable content. (Required; use an ID selector, e.g., "pagewrapper")
- * - easingMode (string): CSS easing mode for the scroll animation (e.g., "ease", "ease-in-out"). Default: "ease".
- * - checkEvent (string): Event type that triggers condition checks (e.g., "scroll", "click", "hover"). Default: "scroll".
- * - hoverTriggers (Array<string>): Array of CSS class names for elements that trigger hover events. (Optional)
- * - triggerElements (Array<string>): Array of element IDs for primary trigger events. (Optional)
- * - conditionElements (Array<string>): Array of element IDs whose CSS attributes are monitored.
- * - conditionArray (Array<Object>): Array of condition objects. Each object must include:
- *      - conditionAttribute (string): The CSS attribute to monitor.
- *      - conditionActive (string): The attribute value that enables scrolling.
- *      - conditionDisable (string): The attribute value that disables scrolling.
- * - maxCheckDuration (number): Maximum duration in milliseconds for repeated condition checks. Default: 1000.
+ * - scrollSpeed (number): Pixels to scroll per event (default: 100).
+ * - smoothScrollFactor (number): Factor (0-100) for scroll animation smoothness (default: 50).
+ * - pageWrapper (string): ID of the scrollable container (required).
+ * - easingMode (string): CSS easing mode for scroll animation (default: "ease").
+ * - checkEvent (string): Event that triggers condition checks (default: "scroll").
+ * - hoverTriggers (Array<string>): CSS classes for hover triggers (optional).
+ * - triggerElements (Array<string>): Element IDs for primary triggers (optional).
+ * - conditionElements (Array<string>): Element IDs to monitor.
+ * - conditionArray (Array<Object>): Conditions with conditionAttribute, conditionActive, conditionDisable.
+ * - maxCheckDuration (number): Maximum duration for condition checks (default: 1000).
  *
- * Example:
- *
- * new ScrollManager({
- *   scrollSpeed: 30,
- *   smoothScrollFactor: 90,
- *   pageWrapper: 'pagewrapper',
- *   easingMode: 'ease-out',
- *   checkEvent: 'click',
- *   hoverTriggers: ['hover-trigger'],
- *   conditionElements: ['menuwhite', 'menublack'],
- *   conditionArray: [
- *     { conditionAttribute: 'opacity', conditionActive: '0', conditionDisable: '1' }
- *   ],
- *   maxCheckDuration: 700
+ * Example instantiation (asynchron sicher):
+ * window.addEventListener('DOMContentLoaded', () => {
+ *   new ScrollManager({
+ *     scrollSpeed: 30,
+ *     smoothScrollFactor: 90,
+ *     pageWrapper: 'pagewrapper',
+ *     easingMode: 'ease-out',
+ *     checkEvent: 'click',
+ *     hoverTriggers: ['hover-trigger'],
+ *     conditionElements: ['menuwhite', 'menublack'],
+ *     conditionArray: [
+ *       { conditionAttribute: 'opacity', conditionActive: '0', conditionDisable: '1' }
+ *     ],
+ *     maxCheckDuration: 700
+ *   });
  * });
  *
  * @version 1.0.0
@@ -268,7 +265,7 @@
     checkConditions() {
       let shouldEnableScroll = false;
       let shouldDisableScroll = false;
-
+  
       this.conditionArray.forEach(condition => {
         const { conditionAttribute, conditionActive, conditionDisable } = condition;
         this.conditionElements.forEach(element => {
@@ -285,7 +282,7 @@
           }
         });
       });
-
+  
       if (shouldDisableScroll) {
         this.disableScroll();
       } else if (shouldEnableScroll) {
@@ -318,6 +315,6 @@
       });
     }
   }
-
+  
   global.ScrollManager = ScrollManager;
 })(window);
