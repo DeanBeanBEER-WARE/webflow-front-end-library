@@ -1,73 +1,119 @@
-# JavaScript Library for Enhancing Webflow Front-End Functionality
+# Webflow Front-End Library
 
-This repository contains a JavaScript library designed to enhance and streamline the front-end functionality of websites built on the **Webflow** platform. The library provides a set of modular, reusable classes to manage various interactive and dynamic behaviors, focusing on improving performance and user experience in Webflow projects.
+A collection of lightweight, modular JavaScript utilities designed to enhance Webflow websites with advanced functionality and improved user experience. This library provides optimized solutions for common front-end challenges while maintaining performance and flexibility.
 
-## Purpose
+## Available Components
 
-Webflow is a powerful platform for web design, but when it comes to implementing more complex interactions or dynamic behaviors, its built-in tools can be limiting. This library extends Webflow’s capabilities, providing lightweight solutions for common front-end tasks such as filtering, animations, and dynamic content manipulation.
+### Core Utilities
 
-### Key Problems the Library Addresses:
+1. **DOMProcessor**
+   - Efficient DOM manipulation and element processing
+   - Foundation for other components in the library
 
-- **Overloaded or Limiting Interaction Panels:** Webflow’s native interaction tools can become complex or lack flexibility, leading to inefficient workflows.
-- **Performance Issues with Complex Interactions:** Handling dynamic content, scroll-based animations, or filters natively can slow down performance.
-- **Limited Customization Options:** Certain advanced features, like fully customized sliders or animations, are difficult to implement without additional coding.
+2. **ScrollManager**
+   - Advanced scroll-based functionality
+   - Handles scroll events and triggers
+   - Optimized for performance
 
-### How This Library Solves These Problems:
+### Interactive Components
 
-- **Modular and Focused Classes:** Each class targets a specific front-end need, ensuring that only the required functionality is included, which keeps the codebase lean.
-- **Performance Optimization:** The library is designed to execute efficiently, minimizing the impact on page load times and overall website performance.
-- **Customizable Features:** The classes are designed to be flexible, allowing developers to easily configure them based on project-specific requirements.
+1. **CustomSlider**
+   - Lightweight alternative to Webflow's native slider
+   - Customizable transitions and animations
+   - Touch-friendly and responsive
 
-## Showcase of Available Classes
+2. **ElementFilter**
+   - Dynamic filtering system for collections
+   - Smooth transitions between filtered states
+   - Support for multiple filter criteria
 
-The library includes a selection of well-defined classes, each serving a distinct purpose. Below is a showcase of some of the key classes included:
+3. **CustomCursor**
+   - Enhanced cursor interactions
+   - Custom cursor styles and behaviors
+   - Smooth movement and transitions
 
-### 1. **ComboClassConfigurator**
+### Animation & Visual Effects
 
-- **Purpose:** Dynamically combine or switch between multiple CSS classes on elements, providing greater flexibility in managing styles based on user interaction.
-- **Use Case:** Modify the appearance of elements as users interact with them (e.g., toggling classes for active/inactive states or switching themes).
+1. **ScrollLetter**
+   - Letter-by-letter scroll animations
+   - Customizable timing and effects
+   - Smooth text reveal on scroll
 
-### 2. **Slider**
+2. **SpanFadeInStagger**
+   - Staggered fade-in animations for text elements
+   - Configurable delay and duration
+   - Smooth, performance-optimized transitions
 
-- **Purpose:** Create a customizable slider component for content like image galleries, testimonials, or product showcases.
-- **Use Case:** Enhance or replace Webflow’s built-in slider with more control over transitions, timing, and responsive behavior.
+3. **Typewriter**
+   - Text typing animation effect
+   - Configurable speed and delays
+   - Support for multiple text strings
 
-### 3. **Filter**
+### Layout & Structure
 
-- **Purpose:** Apply dynamic filtering to a collection of elements based on user input or predefined categories.
-- **Use Case:** Filter a list of products, blog posts, or portfolio items by category or attribute without requiring a page reload.
+1. **UniversalAutoHeight**
+   - Dynamic height adjustment for elements
+   - Smooth transitions between states
+   - Responsive layout management
 
-### 4. **ScrollBrightness**
+2. **ClassConfig**
+   - Dynamic class management system
+   - Efficient state handling
+   - Easy integration with Webflow's class system
 
-- **Purpose:** Adjust the brightness or opacity of elements in response to scroll position, adding dynamic visual effects as users move through the page.
-- **Use Case:** Create visually engaging scrolling effects that highlight sections of content as the user navigates the page.
+## Installation
 
-### 5. **Typewriter**
+1. Choose the component(s) you need from the `/min` directory
+2. Add the minified JavaScript file(s) to your Webflow project:
+   - Navigate to your project settings
+   - Add the script in the "Custom Code" section of your page or in site-wide settings
+   - Alternatively, use them in your exported Webflow site
 
-- **Purpose:** Simulate a typewriter effect for text, where characters are displayed one by one, mimicking a typing animation.
-- **Use Case:** Add engaging text animations to headlines, hero sections, or calls-to-action that draw attention to key messaging.
+## Usage
 
-### 6. **ToggleHeight**
+Each component is designed to work independently or in combination with others. Minified versions are available in the `/min` directory for production use, while the raw source files in `/raw` are available for reference or customization.
 
-- **Purpose:** Smoothly expand and collapse elements by toggling their height, useful for dropdowns, accordions, and collapsible sections.
-- **Use Case:** Manage collapsible content like FAQs or hidden sections, providing a smooth transition between expanded and collapsed states.
+### Example Implementation
 
-These classes represent a **showcase** of the functionality provided by the library. They can be used independently or combined, depending on the specific requirements of your Webflow project.
+```javascript
+// Initialize a custom slider
+const slider = new CustomSlider({
+    container: '.slider-container',
+    slides: '.slide',
+    options: {
+        // Your configuration options
+    }
+});
 
-## Installation and Setup
+// Set up a filter system
+const filter = new ElementFilter({
+    filterButtons: '.filter-button',
+    items: '.filter-item',
+    activeClass: 'active'
+});
+```
 
-1. Include the necessary JavaScript files in your Webflow project by embedding the code directly or adding it to your exported project files.
+## Performance
 
-2. Configure and instantiate the classes according to your project’s needs.
+All components are optimized for performance with:
+- Minimal DOM operations
+- Efficient event handling
+- Optimized animations
+- Small file sizes
 
-## Typical Use Cases
+## Browser Support
 
-- **Interactive Content Management:** Use `Filter` to dynamically show and hide content, such as products or articles, based on user-selected filters.
-- **Custom Sliders:** Replace Webflow’s default sliders with the `Slider` class for more control over animation speed and transitions.
-- **Engaging Scroll Effects:** Use `ScrollBrightness` to add visual interest as users scroll through different sections of your site.
-- **Typewriter Animation for Text:** Enhance key text areas like hero sections or calls to action with the `Typewriter` class to create engaging, animated headlines.
-- **Collapsible Content:** Manage sections of expandable content such as FAQs or information panels using `ToggleHeight` to offer a smooth, user-friendly experience.
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
 
-## Future Development
+## License
 
-As the sole developer of this library, I plan to continue refining and expanding the available functionality based on the needs of real-world Webflow projects. Feedback and suggestions for additional features are always welcome.
+"THE BEER-WARE LICENSE" (Revision 42):
+As long as you retain this notice you can do whatever you want with this stuff.
+If we meet some day, and you think this stuff is worth it, you can buy me a beer in return.
+
+## Contributing
+
+This is a personal library maintained for specific use cases. While it's open for use, it's not currently accepting contributions. Feel free to fork and modify for your own needs.
